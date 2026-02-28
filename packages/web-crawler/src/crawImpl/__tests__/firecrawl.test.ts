@@ -20,12 +20,11 @@ describe('firecrawl crawler', () => {
   it('should successfully crawl content with API key', async () => {
     process.env.FIRECRAWL_API_KEY = 'test-api-key';
 
+    const mockContent = 'This is a test markdown content.';
     const mockResponse = createMockResponse({
       success: true,
       data: {
-        markdown: 'This is a test markdown content with enough length to pass validation. '.repeat(
-          3,
-        ),
+        markdown: mockContent,
         metadata: {
           title: 'Test Article',
           description: 'Test description',
@@ -44,11 +43,10 @@ describe('firecrawl crawler', () => {
     const result = await firecrawl('https://example.com', { filterOptions: {} });
 
     expect(result).toEqual({
-      content: 'This is a test markdown content with enough length to pass validation. '.repeat(3),
+      content: mockContent,
       contentType: 'text',
       description: 'Test description',
-      length: 'This is a test markdown content with enough length to pass validation. '.repeat(3)
-        .length,
+      length: mockContent.length,
       siteName: 'example.com',
       title: 'Test Article',
       url: 'https://example.com',
@@ -82,13 +80,13 @@ describe('firecrawl crawler', () => {
     expect(withTimeout).toHaveBeenCalledWith(expect.any(Function), 30000);
   });
 
-  it('should return undefined for short content', async () => {
+  it('should return short content without rejection', async () => {
     process.env.FIRECRAWL_API_KEY = 'test-api-key';
 
     const mockResponse = createMockResponse({
       success: true,
       data: {
-        markdown: 'Short', // Content too short
+        markdown: 'Short', // Short content is now accepted
         metadata: {
           title: 'Test',
           description: 'Test',
@@ -106,7 +104,15 @@ describe('firecrawl crawler', () => {
 
     const result = await firecrawl('https://example.com', { filterOptions: {} });
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({
+      content: 'Short',
+      contentType: 'text',
+      description: 'Test',
+      length: 5,
+      siteName: 'example.com',
+      title: 'Test',
+      url: 'https://example.com',
+    });
   });
 
   it('should return undefined when markdown is missing', async () => {
@@ -229,10 +235,11 @@ describe('firecrawl crawler', () => {
   it('should handle metadata with all optional fields', async () => {
     process.env.FIRECRAWL_API_KEY = 'test-api-key';
 
+    const mockContent = 'Complete test content with all metadata fields provided.';
     const mockResponse = createMockResponse({
       success: true,
       data: {
-        markdown: 'Complete test content with all metadata fields provided. '.repeat(3),
+        markdown: mockContent,
         metadata: {
           title: 'Complete Test Article',
           description: 'Complete test description',
@@ -257,10 +264,10 @@ describe('firecrawl crawler', () => {
     const result = await firecrawl('https://example.com', { filterOptions: {} });
 
     expect(result).toEqual({
-      content: 'Complete test content with all metadata fields provided. '.repeat(3),
+      content: mockContent,
       contentType: 'text',
       description: 'Complete test description',
-      length: 'Complete test content with all metadata fields provided. '.repeat(3).length,
+      length: mockContent.length,
       siteName: 'example.com',
       title: 'Complete Test Article',
       url: 'https://example.com',

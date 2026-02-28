@@ -33,7 +33,7 @@ describe('Crawler', () => {
 
   it('should crawl successfully with default impls', async () => {
     const mockResult = {
-      content: 'test content'.padEnd(101, ' '), // Ensure content length > 100
+      content: 'test content',
       contentType: 'text' as const,
       url: 'https://example.com',
     };
@@ -55,7 +55,7 @@ describe('Crawler', () => {
 
   it('should use user provided impls', async () => {
     const mockResult = {
-      content: 'test content'.padEnd(101, ' '), // Ensure content length > 100
+      content: 'test content',
       contentType: 'text' as const,
       url: 'https://example.com',
     };
@@ -103,7 +103,7 @@ describe('Crawler', () => {
 
   it('should handle transformed urls', async () => {
     const mockResult = {
-      content: 'test content'.padEnd(101, ' '), // Ensure content length > 100
+      content: 'test content',
       contentType: 'text' as const,
       url: 'https://transformed.example.com',
     };
@@ -131,7 +131,7 @@ describe('Crawler', () => {
 
   it('should merge filter options correctly', async () => {
     const mockResult = {
-      content: 'test content'.padEnd(101, ' '), // Ensure content length > 100
+      content: 'test content',
       contentType: 'text' as const,
       url: 'https://example.com',
     };
@@ -160,7 +160,7 @@ describe('Crawler', () => {
 
   it('should use rule impls when provided', async () => {
     const mockResult = {
-      content: 'test content'.padEnd(101, ' '), // Ensure content length > 100
+      content: 'test content',
       contentType: 'text' as const,
       url: 'https://example.com',
     };
@@ -187,30 +187,24 @@ describe('Crawler', () => {
     });
   });
 
-  it('should skip results with content length <= 100', async () => {
+  it('should return short content without rejection', async () => {
     const mockResult = {
-      content: 'short content', // Content length <= 100
+      content: 'short content', // Short content is now accepted
       contentType: 'text' as const,
       url: 'https://example.com',
     };
 
     const { crawlImpls } = await import('../crawImpl');
     vi.mocked(crawlImpls.naive).mockResolvedValue(mockResult);
-    vi.mocked(crawlImpls.jina).mockResolvedValue(mockResult);
-    vi.mocked(crawlImpls.browserless).mockResolvedValue(mockResult);
 
     const result = await crawler.crawl({
+      impls: ['naive'], // Explicitly use naive to avoid jina being called first
       url: 'https://example.com',
     });
 
     expect(result).toEqual({
-      crawler: 'browserless',
-      data: {
-        content:
-          'Fail to crawl the page. Error type: EmptyCrawlResultError, error message: browserless returned empty or short content',
-        errorMessage: 'browserless returned empty or short content',
-        errorType: 'EmptyCrawlResultError',
-      },
+      crawler: 'naive',
+      data: mockResult,
       originalUrl: 'https://example.com',
       transformedUrl: undefined,
     });

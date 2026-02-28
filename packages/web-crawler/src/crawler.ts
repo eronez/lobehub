@@ -59,7 +59,7 @@ export class Crawler {
       try {
         const res = await crawlImpls[impl](transformedUrl, { filterOptions: mergedFilterOptions });
 
-        if (res && res.content && res.content.length > 100) {
+        if (res && res.content) {
           return {
             crawler: impl,
             data: res,
@@ -68,7 +68,7 @@ export class Crawler {
           };
         }
 
-        finalError = new Error(`${impl} returned empty or short content`);
+        finalError = new Error(`${impl} returned empty content`);
         finalError.name = 'EmptyCrawlResultError';
         finalCrawler = impl;
       } catch (error) {

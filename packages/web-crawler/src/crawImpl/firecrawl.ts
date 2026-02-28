@@ -98,8 +98,8 @@ export const firecrawl: CrawlImpl = async (url) => {
     console.error('[Firecrawl] Metadata error:', data.data.metadata.error);
   }
 
-  // Check if content is empty or too short
-  if (!data.data.markdown || data.data.markdown.length < 100) {
+  // Check if content is empty
+  if (!data.data.markdown) {
     return;
   }
 

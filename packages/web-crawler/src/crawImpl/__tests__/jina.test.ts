@@ -22,10 +22,7 @@ describe('jina crawler', () => {
   });
 
   it('should crawl url successfully', async () => {
-    const testContent =
-      'This is a test content that is long enough to pass the minimum length validation check. '.repeat(
-        2,
-      );
+    const testContent = 'This is a test content.';
 
     const mockResponse = createMockResponse(
       {

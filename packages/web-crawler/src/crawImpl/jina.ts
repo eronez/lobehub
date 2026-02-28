@@ -43,7 +43,7 @@ export const jina: CrawlImpl<{ apiKey?: string }> = async (url, params) => {
   }
 
   const result = json.data;
-  if (!result?.content || result.content.length < 100) {
+  if (!result?.content) {
     return;
   }
 

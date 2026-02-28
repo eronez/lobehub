@@ -50,8 +50,8 @@ export const search1api: CrawlImpl = async (url) => {
 
   const data = await parseJSONResponse<Search1ApiResponse>(res, 'Search1API');
 
-  // Check if content is empty or too short
-  if (!data.results?.content || data.results.content.length < 100) {
+  // Check if content is empty
+  if (!data.results?.content) {
     return;
   }
 
