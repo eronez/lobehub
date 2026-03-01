@@ -60,8 +60,7 @@ describe('browserless', () => {
 
   it('should return crawl result on successful fetch', async () => {
     process.env.BROWSERLESS_TOKEN = 'test-token';
-    const longContent =
-      'This is a test paragraph with enough content to pass the length check. '.repeat(3);
+    const content = 'This is a test paragraph.';
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -73,7 +72,7 @@ describe('browserless', () => {
             <meta name="description" content="Test Description">
           </head>
           <body>
-            <p>${longContent}</p>
+            <p>${content}</p>
           </body>
         </html>
       `),

@@ -19,6 +19,7 @@ describe('exa crawler', () => {
   it('should successfully crawl content with API key', async () => {
     process.env.EXA_API_KEY = 'test-api-key';
 
+    const mockText = 'This is a test article.';
     const mockResponse = createMockResponse({
       requestId: 'test-request-id',
       results: [
@@ -26,7 +27,7 @@ describe('exa crawler', () => {
           id: 'test-id',
           title: 'Test Article',
           url: 'https://example.com',
-          text: 'This is a test article with enough content to pass the length check. '.repeat(3),
+          text: mockText,
           author: 'Test Author',
           publishedDate: '2023-01-01',
           summary: 'Test summary',
@@ -40,10 +41,9 @@ describe('exa crawler', () => {
     const result = await exa('https://example.com', { filterOptions: {} });
 
     expect(result).toEqual({
-      content: 'This is a test article with enough content to pass the length check. '.repeat(3),
+      content: mockText,
       contentType: 'text',
-      length: 'This is a test article with enough content to pass the length check. '.repeat(3)
-        .length,
+      length: mockText.length,
       siteName: 'example.com',
       title: 'Test Article',
       url: 'https://example.com',
@@ -97,7 +97,7 @@ describe('exa crawler', () => {
     consoleSpy.mockRestore();
   });
 
-  it('should return undefined for short content', async () => {
+  it('should return short content without rejection', async () => {
     process.env.EXA_API_KEY = 'test-api-key';
 
     const mockResponse = createMockResponse({
@@ -105,7 +105,7 @@ describe('exa crawler', () => {
         {
           title: 'Test Article',
           url: 'https://example.com',
-          text: 'Short', // Content too short
+          text: 'Short', // Short content is now accepted
         },
       ],
     });
@@ -115,7 +115,14 @@ describe('exa crawler', () => {
 
     const result = await exa('https://example.com', { filterOptions: {} });
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({
+      content: 'Short',
+      contentType: 'text',
+      length: 5,
+      siteName: 'example.com',
+      title: 'Test Article',
+      url: 'https://example.com',
+    });
   });
 
   it('should throw PageNotFoundError for 404 status', async () => {

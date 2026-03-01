@@ -35,20 +35,20 @@ describe('naive crawler', () => {
 
     const { htmlToMarkdown } = await import('../../utils/htmlToMarkdown');
     vi.mocked(htmlToMarkdown).mockReturnValue({
-      content: 'Test content'.padEnd(101, ' '),
+      content: 'Test content',
       title: 'Normal Page Title',
       description: 'Test description',
       siteName: 'Test Site',
-      length: 101,
+      length: 12,
     });
 
     const result = await naive('https://example.com', { filterOptions: {} });
 
     expect(result).toEqual({
-      content: 'Test content'.padEnd(101, ' '),
+      content: 'Test content',
       contentType: 'text',
       description: 'Test description',
-      length: 101,
+      length: 12,
       siteName: 'Test Site',
       title: 'Normal Page Title',
       url: 'https://example.com',
@@ -105,7 +105,7 @@ describe('naive crawler', () => {
     });
   });
 
-  it('should return undefined for short content', async () => {
+  it('should return short content without rejection', async () => {
     const mockResponse = {
       status: 200,
       ok: true,
@@ -118,14 +118,22 @@ describe('naive crawler', () => {
 
     const { htmlToMarkdown } = await import('../../utils/htmlToMarkdown');
     vi.mocked(htmlToMarkdown).mockReturnValue({
-      content: 'Short', // Length < 100
+      content: 'Short', // Short content is now accepted
       title: 'Test Page',
       length: 5,
     });
 
     const result = await naive('https://example.com', { filterOptions: {} });
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({
+      content: 'Short',
+      contentType: 'text',
+      description: undefined,
+      length: 5,
+      siteName: undefined,
+      title: 'Test Page',
+      url: 'https://example.com',
+    });
   });
 
   it('should return undefined when blocked by Cloudflare', async () => {
@@ -141,11 +149,11 @@ describe('naive crawler', () => {
 
     const { htmlToMarkdown } = await import('../../utils/htmlToMarkdown');
     vi.mocked(htmlToMarkdown).mockReturnValue({
-      content: 'Test content'.padEnd(101, ' '),
+      content: 'Test content',
       title: 'Just a moment...', // Cloudflare blocking page
       description: 'Test description',
       siteName: 'Test Site',
-      length: 101,
+      length: 12,
     });
 
     const result = await naive('https://example.com', { filterOptions: {} });
@@ -239,9 +247,9 @@ describe('naive crawler', () => {
 
     const { htmlToMarkdown } = await import('../../utils/htmlToMarkdown');
     vi.mocked(htmlToMarkdown).mockReturnValue({
-      content: 'Test content'.padEnd(101, ' '),
+      content: 'Test content',
       title: 'Test Page',
-      length: 101,
+      length: 12,
     });
 
     const filterOptions = { enableReadability: true, pureText: false };

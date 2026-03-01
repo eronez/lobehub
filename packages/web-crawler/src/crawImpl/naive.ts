@@ -84,8 +84,8 @@ export const naive: CrawlImpl = async (url, { filterOptions }) => {
 
     const result = htmlToMarkdown(html, { filterOptions, url });
 
-    // if the content is empty or too short, just return
-    if (!result.content || result.content.length < 100) {
+    // if the content is empty, just return
+    if (!result.content) {
       return;
     }
 

@@ -78,7 +78,7 @@ describe('search1api crawler', () => {
     );
   });
 
-  it('should return undefined when content is too short', async () => {
+  it('should return crawl result for short content', async () => {
     mockFetch.mockResolvedValue(
       createMockResponse(
         {
@@ -86,7 +86,7 @@ describe('search1api crawler', () => {
           results: {
             title: 'Test Title',
             link: 'https://example.com',
-            content: 'Short', // Less than 100 characters
+            content: 'Short', // Short content is now accepted
           },
         },
         { ok: true },
@@ -94,11 +94,19 @@ describe('search1api crawler', () => {
     );
 
     const result = await search1api('https://example.com', { filterOptions: {} });
-    expect(result).toBeUndefined();
+    expect(result).toEqual({
+      content: 'Short',
+      contentType: 'text',
+      title: 'Test Title',
+      description: 'Test Title',
+      length: 5,
+      siteName: 'example.com',
+      url: 'https://example.com',
+    });
   });
 
   it('should return crawl result on successful fetch', async () => {
-    const mockContent = 'This is a test content that is longer than 100 characters. '.repeat(3);
+    const mockContent = 'This is a test content.';
 
     mockFetch.mockResolvedValue(
       createMockResponse(

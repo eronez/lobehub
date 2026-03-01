@@ -20,14 +20,14 @@ describe('tavily crawler', () => {
   it('should successfully crawl content with API key', async () => {
     process.env.TAVILY_API_KEY = 'test-api-key';
 
+    const mockContent = 'This is a test raw content.';
     const mockResponse = createMockResponse({
       base_url: 'https://api.tavily.com',
       response_time: 1.5,
       results: [
         {
           url: 'https://example.com',
-          raw_content:
-            'This is a test raw content with sufficient length to pass validation. '.repeat(3),
+          raw_content: mockContent,
           images: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'],
         },
       ],
@@ -39,10 +39,9 @@ describe('tavily crawler', () => {
     const result = await tavily('https://example.com', { filterOptions: {} });
 
     expect(result).toEqual({
-      content: 'This is a test raw content with sufficient length to pass validation. '.repeat(3),
+      content: mockContent,
       contentType: 'text',
-      length: 'This is a test raw content with sufficient length to pass validation. '.repeat(3)
-        .length,
+      length: mockContent.length,
       siteName: 'example.com',
       title: 'example.com',
       url: 'https://example.com',
@@ -119,7 +118,7 @@ describe('tavily crawler', () => {
     consoleSpy.mockRestore();
   });
 
-  it('should return undefined for short content', async () => {
+  it('should return short content without rejection', async () => {
     process.env.TAVILY_API_KEY = 'test-api-key';
 
     const mockResponse = createMockResponse({
@@ -128,7 +127,7 @@ describe('tavily crawler', () => {
       results: [
         {
           url: 'https://example.com',
-          raw_content: 'Short', // Content too short
+          raw_content: 'Short', // Short content is now accepted
         },
       ],
     });
@@ -138,7 +137,14 @@ describe('tavily crawler', () => {
 
     const result = await tavily('https://example.com', { filterOptions: {} });
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({
+      content: 'Short',
+      contentType: 'text',
+      length: 5,
+      siteName: 'example.com',
+      title: 'example.com',
+      url: 'https://example.com',
+    });
   });
 
   it('should return undefined when raw_content is missing', async () => {

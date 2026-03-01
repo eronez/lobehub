@@ -65,8 +65,8 @@ export const exa: CrawlImpl = async (url) => {
 
   const firstResult = data.results[0];
 
-  // Check if content is empty or too short
-  if (!firstResult.text || firstResult.text.length < 100) {
+  // Check if content is empty
+  if (!firstResult.text) {
     return;
   }
 

@@ -66,8 +66,8 @@ export const tavily: CrawlImpl = async (url) => {
 
   const firstResult = data.results[0];
 
-  // Check if content is empty or too short
-  if (!firstResult.raw_content || firstResult.raw_content.length < 100) {
+  // Check if content is empty
+  if (!firstResult.raw_content) {
     return;
   }
 
